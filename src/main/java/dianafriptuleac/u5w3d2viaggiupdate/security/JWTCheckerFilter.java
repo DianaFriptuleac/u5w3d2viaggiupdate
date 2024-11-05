@@ -30,7 +30,8 @@ public class JWTCheckerFilter extends OncePerRequestFilter {
 
     //Metodo richiamato ad ogni richiesta - controlla il token
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
 
         //----------------------------------- Autenticazione -----------------------------------------------
 

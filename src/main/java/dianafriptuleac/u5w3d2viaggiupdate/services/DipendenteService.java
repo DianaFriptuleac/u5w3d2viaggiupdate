@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,6 +33,10 @@ public class DipendenteService {
     @Autowired
     private Cloudinary cloudinaryUploader;
 
+    //bcrypt x password
+    @Autowired
+    private PasswordEncoder bdrypt;
+
     public Dipendente saveDipendente(DipendenteDTO body) {
         this.dipendenteRepository.findByEmail(body.email()).ifPresent(dipendente -> {
             throw new BadRequestException("Email " + body.email() + " già in uso!");
@@ -41,7 +46,7 @@ public class DipendenteService {
             throw new BadRequestException("Username " + body.username() + " già in uso!");
         });
 
-        Dipendente newDipendente = new Dipendente(body.username(), body.nome(), body.cognome(), body.email(), body.password(),
+        Dipendente newDipendente = new Dipendente(body.username(), body.nome(), body.cognome(), body.email(), bdrypt.encode(body.password()),
                 "https://ui-avatars.com/api/?name=" + body.nome() + "+" + body.cognome());
         return this.dipendenteRepository.save(newDipendente);
     }

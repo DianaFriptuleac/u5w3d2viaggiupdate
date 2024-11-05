@@ -1,6 +1,7 @@
 package dianafriptuleac.u5w3d2viaggiupdate.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import dianafriptuleac.u5w3d2viaggiupdate.enums.Role;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -21,6 +22,9 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
+//Campi che non voglio visualizzare
+@JsonIgnoreProperties({"password", "role", "accountNonLocked",
+        "credentialsNonExpired", "accountNonExpired", "authorities", "enabled"})
 public class Dipendente implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -71,5 +75,5 @@ public class Dipendente implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(this.role.name()));
     }
-    
+
 }
