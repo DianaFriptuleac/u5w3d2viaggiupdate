@@ -8,6 +8,7 @@ import dianafriptuleac.u5w3d2viaggiupdate.services.DipendenteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +22,7 @@ public class DipendentiController {
     private DipendenteService dipendenteService;
 
     @GetMapping
+    @PreAuthorize("hasAuthority('ADMIN')") //solo gli admin possono visualizzare tutti i dipendenti
     public Page<Dipendente> findAllDipendenti(@RequestParam(defaultValue = "0") int page,
                                               @RequestParam(defaultValue = "8") int size,
                                               @RequestParam(defaultValue = "id") String sortBy) {
@@ -34,6 +36,7 @@ public class DipendentiController {
     }
 
     @PutMapping("/{dipendenteId}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public Dipendente findByIdAndUpdate(@PathVariable Long dipendenteId, @RequestBody @Validated DipendenteDTO body, BindingResult validationResult) {
         if (validationResult.hasErrors()) {
             validationResult.getAllErrors().forEach(System.out::println);
@@ -43,6 +46,7 @@ public class DipendentiController {
     }
 
     @DeleteMapping("/{dipendenteId}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void findByIdAndDelete(@PathVariable Long dipendenteId) {
         dipendenteService.findByIdAndDelete(dipendenteId);

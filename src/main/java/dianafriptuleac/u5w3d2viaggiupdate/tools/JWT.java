@@ -41,4 +41,11 @@ public class JWT {
         }
     }
 
+    //Metodo getIdFromToken per l'autorizzazione
+    public String getIdFromToken(String accessToken) {
+        return Jwts.parser().verifyWith(Keys.hmacShaKeyFor(secret.getBytes())).build().
+                parseSignedClaims(accessToken).getPayload().getSubject();
+        //all'interno del Payload nel campo subject avevamo inserito l'id dipendente
+    }
+
 }

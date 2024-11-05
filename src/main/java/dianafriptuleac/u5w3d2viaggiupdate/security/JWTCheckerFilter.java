@@ -1,12 +1,17 @@
 package dianafriptuleac.u5w3d2viaggiupdate.security;
 
+import dianafriptuleac.u5w3d2viaggiupdate.entities.Dipendente;
 import dianafriptuleac.u5w3d2viaggiupdate.exceptions.UnauthorizedException;
+import dianafriptuleac.u5w3d2viaggiupdate.services.DipendenteService;
 import dianafriptuleac.u5w3d2viaggiupdate.tools.JWT;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -20,9 +25,14 @@ public class JWTCheckerFilter extends OncePerRequestFilter {
     @Autowired
     private JWT jwt;
 
+    @Autowired
+    private DipendenteService dipendenteService;
+
     //Metodo richiamato ad ogni richiesta - controlla il token
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+
+        //----------------------------------- Autenticazione -----------------------------------------------
 
         // 1. Verifico se nella richiesta è presente l'Authorization Header,
         // e se è ben formato ("Bearer josdjojosdj..."), altimenti - 401
@@ -36,7 +46,19 @@ public class JWTCheckerFilter extends OncePerRequestFilter {
         //3.Verifico il token con il metodo del jwt.verifyToken(accessToken) che si trova nel tools.
         jwt.verifyToken(accessToken);
 
-        //4. Se e tutto ok - passo la richiesta al prossiimo filtro con filterChain.
+        //----------------------------------- Autorizzazione -----------------------------------------------
+        //1. Cerco utente tramite id
+        String dipendenteId = jwt.getIdFromToken(accessToken);
+        Dipendente currentDipendente = this.dipendenteService.findById(Long.parseLong(dipendenteId));
+
+        //2. Associo Security Context al dipendente
+        Authentication authentication = new UsernamePasswordAuthenticationToken(currentDipendente, null, currentDipendente.getAuthorities());
+        // Il terzo parametro serve per  utilizzare @PreAuthorize, così il SecurityContext saprà quali sono i ruoli dell dipendente
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        // Aggiorno SecurityContext associandogli il dipendente autenticato
+
+
+        //3. Se e tutto ok - passo la richiesta al prossiimo filtro con filterChain.
         //con doFilter(request, response) riichiamo il prossimo filtro o controller della catena
         //filterChain- catena di filtri di sicurezza
         filterChain.doFilter(request, response);
