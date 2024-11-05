@@ -82,7 +82,7 @@ public class DipendenteService {
         foundDipendente.setNome(body.nome());
         foundDipendente.setCognome(body.cognome());
         foundDipendente.setEmail(body.email());
-        foundDipendente.setPassword(body.password());
+        foundDipendente.setPassword(bdrypt.encode(body.password()));
         foundDipendente.setImgURL("https://ui-avatars.com/api/?name=" + body.nome() + "+" + body.cognome());
         return this.dipendenteRepository.save(foundDipendente);
     }

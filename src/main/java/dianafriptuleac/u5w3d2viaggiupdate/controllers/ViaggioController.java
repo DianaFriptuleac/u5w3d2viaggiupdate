@@ -8,6 +8,7 @@ import dianafriptuleac.u5w3d2viaggiupdate.services.ViaggioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +28,9 @@ public class ViaggioController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
     @ResponseStatus(HttpStatus.CREATED)
+
     public Viaggio save(@RequestBody @Validated ViaggioDTO body, BindingResult validationResult) {
         if (validationResult.hasErrors()) {
             String message = validationResult.getAllErrors().stream().map(objectError -> objectError.getDefaultMessage())
@@ -44,6 +47,7 @@ public class ViaggioController {
     }
 
     @PutMapping("/{viaggioId}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public Viaggio findByIdAndUpdate(@PathVariable Long viaggioId, @RequestBody @Validated ViaggioDTO body, BindingResult validationResult) {
         if (validationResult.hasErrors()) {
             validationResult.getAllErrors().forEach(System.out::println);
@@ -53,12 +57,14 @@ public class ViaggioController {
     }
 
     @DeleteMapping("/{viaggioId}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void findByIdAndDelete(@PathVariable Long viaggioId) {
         viaggioService.findByIdAndDelete(viaggioId);
     }
 
     @PatchMapping("/{viaggioId}/stato")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String uploadStato(@PathVariable Long viaggioId, @RequestParam("stato") String newStato) {
         Viaggio upViaggio = this.viaggioService.updateStato(viaggioId, newStato);
         return "Lo stato del viaggio con ID " + viaggioId + " è stato aggiornato correttamente a: " + upViaggio.getStato();
